@@ -11,38 +11,30 @@
 #include <vector>
 using namespace std;
 
-#define WIDTH 51
-#define HEIGHT 21
-#define GRID array<array<bool, HEIGHT>, WIDTH>
+#define GRID vector<vector<bool>>
 
 // This is intended to automatically handle out-of-bound conditions.
+bool is_in_bounds (const GRID& is_walls, const int x, const int y) {
+    return x >= 0 && y >= 0 && x < is_walls.size() && y < is_walls[0].size();
+}
 bool is_unvisited (const GRID& is_walls, const int x, const int y) {
-    if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
+    if (is_in_bounds(is_walls, x, y))
         return is_walls[x][y];
-    }
     return false;
 }
 bool is_corridor (const GRID& is_walls, const int x, const int y) {
-    if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
+    if (is_in_bounds(is_walls, x, y))
         return !is_walls[x][y];
-    }
     return false;
 }
 bool is_wall (const GRID& is_walls, const int x, const int y) {
-    if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
+    if (is_in_bounds(is_walls, x, y))
         return is_walls[x][y];
-    }
     return false;
 }
 
-GRID generate () {
-    GRID is_walls;
-    for (int y=0; y<HEIGHT; y++) {
-        for (int x=0; x<WIDTH; x++) {
-            is_walls[x][y] = true;
-        }
-    }
-    
+GRID generate (int width, int height) {
+    GRID is_walls (width, vector<bool>(height, true));
     int fx = 1, fy = 1;
     vector<pair<int, int>> could_turn;
     
@@ -95,26 +87,37 @@ GRID generate () {
 }
 
 array<string, 16> get_tileset(int style) {
-    if (style == 2 || style == 4)
+    style %= 4;
+    if (style == 1) //Bold
+        return {" ","╻","╹","┃","╺","┏","┗","┣",
+            "╸","┓","┛","┫","━","┳","┻","╋"};
+    if (style == 2) //Double
+        return {" ","╷","╵","║","╶","╔","╚","╠",
+            "╴","╗","╝","╣","═","╦","╩","╬"};
+    if (style == 3) //Curved
         return {" ","╷","╵","│","╶","╭","╰","├",
-                "╴","╮","╯","┤","─","┬","┴","┼"};
+            "╴","╮","╯","┤","─","┬","┴","┼"};
+    //Thin
     return {" ","╷","╵","│","╶","┌","└","├",
             "╴","┐","┘","┤","─","┬","┴","┼"};
 }
-
-void display_maze (GRID& is_walls, int style = 0) {
-    if (style == 0) {
-        for (int y=0; y<HEIGHT; y++) {
-            for (int x=0; x<WIDTH; x++) {
+void display_maze (GRID& is_walls, int style = -1) {
+    const u_long
+    width = is_walls.size(),
+    height = is_walls[0].size();
+    
+    if (style == -1) {
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
                 cout << (is_walls[x][y] ? "#" : ".");
             }
             cout << endl;
         }
-    } else if (style > 0) {
+    } else if (style >= 0 && style <= 7) {
         const array<string, 16> tileset = get_tileset(style);
         int tile;
-        for (int y=0; y<HEIGHT; y+=2) {
-            for (int x=0; x<WIDTH; x+=2) {
+        for (int y=0; y<height; y+=2) {
+            for (int x=0; x<width; x+=2) {
                 
                 tile = 0;
                 if (is_wall(is_walls, x, y+1)) tile += 1;
@@ -123,7 +126,7 @@ void display_maze (GRID& is_walls, int style = 0) {
                 if (is_wall(is_walls, x-1, y)) tile += 8;
                 cout << tileset[tile];
                 
-                if (style > 2) {
+                if (style > 3) {
                     if ((tile > 3 && tile < 8) || (tile > 11 && tile < 16)) {
                         cout << tileset[12];
                     } else {
@@ -139,12 +142,9 @@ void display_maze (GRID& is_walls, int style = 0) {
 }
 
 int main(int argc, const char * argv[]) {
-    cout << "Started" << endl;
+    int  width = 51, height = 21;
     
-    GRID is_walls = generate();
-    
-    display_maze(is_walls, 2);
-    
-    cout << "Ended" << endl;
+    GRID is_walls = generate(width, height);
+    display_maze(is_walls, 1);
     return 0;
 }
