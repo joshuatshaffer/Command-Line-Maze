@@ -11,12 +11,24 @@
 #include <vector>
 using namespace std;
 
-#define WIDTH 31
+#define WIDTH 51
 #define HEIGHT 21
 #define GRID array<array<bool, HEIGHT>, WIDTH>
 
-// This is intended to automaticaly handel out of bounds conditions.
+// This is intended to automatically handle out-of-bound conditions.
 bool is_unvisited (const GRID& is_walls, const int x, const int y) {
+    if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
+        return is_walls[x][y];
+    }
+    return false;
+}
+bool is_corridor (const GRID& is_walls, const int x, const int y) {
+    if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
+        return !is_walls[x][y];
+    }
+    return false;
+}
+bool is_wall (const GRID& is_walls, const int x, const int y) {
     if (x >= 0 && y >= 0 && x < WIDTH && y < HEIGHT) {
         return is_walls[x][y];
     }
@@ -46,7 +58,7 @@ GRID generate () {
         if (is_unvisited(is_walls, fx - 2, fy))
             choices.push_back('W');
         
-        // suppost to be "nchoices = choices.size();" but that erred.
+        // supposed to be "nchoices = choices.size();" but that erred.
         const long& nchoices = distance(choices.begin(), choices.end());
         
         if (nchoices < 1) {
@@ -82,12 +94,32 @@ GRID generate () {
     return is_walls;
 }
 
-void display_maze (GRID& is_walls) {
-    for (int y=0; y<HEIGHT; y++) {
-        for (int x=0; x<WIDTH; x++) {
-            cout << (is_walls[x][y] ? "#" : ".");
+void display_maze (GRID& is_walls, int style = 0) {
+    if (style == 0) {
+        for (int y=0; y<HEIGHT; y++) {
+            for (int x=0; x<WIDTH; x++) {
+                cout << (is_walls[x][y] ? "#" : ".");
+            }
+            cout << endl;
         }
-        cout << endl;
+    } else if (style > 0) {
+        const string tileset[16]
+           {"e","╷","╵","│",
+            "╶","┌","└","├",
+            "╴","┐","┘","┤",
+            "─","┬","┴","┼"};
+        int tile;
+        for (int y=0; y<HEIGHT; y+=2) {
+            for (int x=0; x<WIDTH; x+=2) {
+                tile = 0;
+                if (is_wall(is_walls, x, y+1)) tile += 1;
+                if (is_wall(is_walls, x, y-1)) tile += 2;
+                if (is_wall(is_walls, x+1, y)) tile += 4;
+                if (is_wall(is_walls, x-1, y)) tile += 8;
+                cout << tileset[tile];
+            }
+            cout << endl;
+        }
     }
 }
 
@@ -96,7 +128,7 @@ int main(int argc, const char * argv[]) {
     
     GRID is_walls = generate();
     
-    display_maze(is_walls);
+    display_maze(is_walls, 1);
     
     cout << "Ended" << endl;
     return 0;
