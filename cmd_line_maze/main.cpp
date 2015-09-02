@@ -94,6 +94,14 @@ GRID generate () {
     return is_walls;
 }
 
+array<string, 16> get_tileset(int style) {
+    if (style == 2 || style == 4)
+        return {" ","╷","╵","│","╶","╭","╰","├",
+                "╴","╮","╯","┤","─","┬","┴","┼"};
+    return {" ","╷","╵","│","╶","┌","└","├",
+            "╴","┐","┘","┤","─","┬","┴","┼"};
+}
+
 void display_maze (GRID& is_walls, int style = 0) {
     if (style == 0) {
         for (int y=0; y<HEIGHT; y++) {
@@ -103,23 +111,30 @@ void display_maze (GRID& is_walls, int style = 0) {
             cout << endl;
         }
     } else if (style > 0) {
-        const string tileset[16]
-           {"e","╷","╵","│",
-            "╶","┌","└","├",
-            "╴","┐","┘","┤",
-            "─","┬","┴","┼"};
+        const array<string, 16> tileset = get_tileset(style);
         int tile;
         for (int y=0; y<HEIGHT; y+=2) {
             for (int x=0; x<WIDTH; x+=2) {
+                
                 tile = 0;
                 if (is_wall(is_walls, x, y+1)) tile += 1;
                 if (is_wall(is_walls, x, y-1)) tile += 2;
                 if (is_wall(is_walls, x+1, y)) tile += 4;
                 if (is_wall(is_walls, x-1, y)) tile += 8;
                 cout << tileset[tile];
-            }
+                
+                if (style > 2) {
+                    if ((tile > 3 && tile < 8) || (tile > 11 && tile < 16)) {
+                        cout << tileset[12];
+                    } else {
+                        cout << tileset[0];
+                    }
+                }
+            } //END x loop
             cout << endl;
-        }
+        } //END y loop
+    } else {
+        throw "style number is invalid";
     }
 }
 
@@ -128,7 +143,7 @@ int main(int argc, const char * argv[]) {
     
     GRID is_walls = generate();
     
-    display_maze(is_walls, 1);
+    display_maze(is_walls, 2);
     
     cout << "Ended" << endl;
     return 0;
