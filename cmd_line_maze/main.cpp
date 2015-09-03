@@ -133,10 +133,72 @@ void display_maze (GRID& is_walls, int style = -1) {
     }
 }
 
-int main(int argc, const char * argv[]) {
-    int  width = 51, height = 21;
-    
-    GRID is_walls = generate(width, height);
-    display_maze(is_walls, 1);
-    return 0;
+int main(int argc, const char* argv[]) {
+    if (argc < 2) {
+        cout << "You messed up the arguments" << endl;
+        return -1;
+    } else {
+        int width = atoi(argv[1]), height = atoi(argv[2]);
+        if (width  % 2 == 0) width--;
+        if (height % 2 == 0) height--;
+        
+        bool got_style = false;
+        bool got_wide = false;
+        //bool got_seed = false;
+        int style = -1;
+        for (int i = 3; i < argc; i++) {
+            if (strcmp(argv[i], "l") == 0 ||
+                strcmp(argv[i], "line") == 0) {
+                if (got_style) {
+                    cout << "You messed up the arguments" << endl;
+                    return -1;
+                }
+                got_style = true;
+                style = 0;
+            } else if (strcmp(argv[i], "b") == 0 ||
+                       strcmp(argv[i], "bold") == 0) {
+                if (got_style) {
+                    cout << "You messed up the arguments" << endl;
+                    return -1;
+                }
+                got_style = true;
+                style = 1;
+            } else if (strcmp(argv[i], "d") == 0 ||
+                       strcmp(argv[i], "double") == 0) {
+                if (got_style) {
+                    cout << "You messed up the arguments" << endl;
+                    return -1;
+                }
+                got_style = true;
+                style = 2;
+            } else if (strcmp(argv[i], "c") == 0 ||
+                       strcmp(argv[i], "curved") == 0) {
+                if (got_style) {
+                    cout << "You messed up the arguments" << endl;
+                    return -1;
+                }
+                got_style = true;
+                style = 3;
+            } else if (strcmp(argv[i], "w") == 0 ||
+                       strcmp(argv[i], "wide") == 0) {
+                if (got_wide) {
+                    cout << "You messed up the arguments" << endl;
+                    return -1;
+                }
+                got_wide = true;
+            }
+        }
+        if (got_wide) {
+            if (got_style) {
+                style += 4;
+            } else {
+                cout << "You messed up the arguments" << endl;
+                return -1;
+            }
+        }
+        
+        GRID is_walls = generate(width, height);
+        display_maze(is_walls, style);
+        return 0;
+    }
 }
