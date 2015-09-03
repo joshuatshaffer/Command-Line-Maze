@@ -85,21 +85,13 @@ GRID generate (int width, int height) {
     }
     return is_walls;
 }
-
-array<string, 16> get_tileset(int style) {
-    style %= 4;
-    if (style == 1) //Bold
-        return {" ","╻","╹","┃","╺","┏","┗","┣",
-            "╸","┓","┛","┫","━","┳","┻","╋"};
-    if (style == 2) //Double
-        return {" ","╷","╵","║","╶","╔","╚","╠",
-            "╴","╗","╝","╣","═","╦","╩","╬"};
-    if (style == 3) //Curved
-        return {" ","╷","╵","│","╶","╭","╰","├",
-            "╴","╮","╯","┤","─","┬","┴","┼"};
-    //Thin
-    return {" ","╷","╵","│","╶","┌","└","├",
-            "╴","┐","┘","┤","─","┬","┴","┼"};
+// Returns the appropriate tileset for the given style #
+array<string, 16> get_tileset(int s) {
+    s %= 4;
+    if (s==0) return {" ","╷","╵","│","╶","┌","└","├","╴","┐","┘","┤","─","┬","┴","┼"};
+    if (s==1) return {" ","╻","╹","┃","╺","┏","┗","┣","╸","┓","┛","┫","━","┳","┻","╋"};
+    if (s==2) return {" ","╷","╵","║","╶","╔","╚","╠","╴","╗","╝","╣","═","╦","╩","╬"};
+              return {" ","╷","╵","│","╶","╭","╰","├","╴","╮","╯","┤","─","┬","┴","┼"};
 }
 void display_maze (GRID& is_walls, int style = -1) {
     const u_long
@@ -142,7 +134,6 @@ void display_maze (GRID& is_walls, int style = -1) {
 }
 
 int main(int argc, const char * argv[]) {
-    //test
     int  width = 51, height = 21;
     
     GRID is_walls = generate(width, height);
