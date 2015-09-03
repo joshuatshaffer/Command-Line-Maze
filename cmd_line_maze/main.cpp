@@ -142,6 +142,7 @@ void display_maze (GRID& is_walls, int style = -1) {
 }
 
 int main(int argc, const char * argv[]) {
+    //test
     int  width = 51, height = 21;
     
     GRID is_walls = generate(width, height);
